@@ -1,5 +1,11 @@
 def calcular_caida_tension():
     print("🧮 CÁLCULO DE CAÍDA DE TENSIÓN EN CABLES")
+
+    # Calculo Intensidad
+    W = float(input("Ingrese Wattios (W): "))
+
+    # Calcular intensidad 
+    I = W / 
     
     # Entrada de datos
     I = float(input("Ingrese la corriente (A): "))
