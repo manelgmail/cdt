@@ -5,6 +5,7 @@ def calcular_caida_tension():
     I = float(input("Ingrese la corriente (A): "))
     L = float(input("Ingrese la longitud del cable (m): "))
     A = float(input("Ingrese la sección del cable (mm^2): "))
+    COS = float(input("Ingrese valor COS: "))
     
     print("Tipo de material:")
     print("1 - Cobre")
@@ -21,7 +22,7 @@ def calcular_caida_tension():
         rho = 0.0175
 
     # Cálculo de la caída de tensión
-    Vd = (2 * rho * L * I) / A
+    Vd = (2 * rho * L * I * COS) / A
     
     # Mostrar resultado
     print(f"\n🔌 Caída de tensión: {Vd:.2f} V")
