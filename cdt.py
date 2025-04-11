@@ -13,7 +13,7 @@ def calcular_caida_tension():
     
     # Resistividad según material
     if M == 1:
-        rho = 0.0175  # ohm·mm²/m para cobre
+        rho = 0.0178  # ohm·mm²/m para cobre
     elif M == 2:
         rho = 0.0282  # ohm·mm²/m para aluminio
     else:
