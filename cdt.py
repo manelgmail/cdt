@@ -22,20 +22,22 @@ def calcular_caida_tension():
     else:
         print("Opción inválida. Asignando cobre por defecto.")
         rho = 0.0178
+    # Lista intensidades normalizadas IGA
+    intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63]
+    # Buscar la intensidad normalizada más cercana mayor o igual a I
+    I_normalizada = next((i for i in intensidades_normalizadas if i >= I), None)
 
     # Calcular Sección    
     S = (2 * rho * L * I_normalizada * COS) / 2.3
     
     # Lista de secciones normalizadas (en mm²)
     secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
-    intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63]
+    
 
     # Buscar la sección normalizada más cercana mayor o igual a S
     S_normalizada = next((s for s in secciones_normalizadas if s >= S), None)
     
-    # Buscar la intensidad normalizada más cercana mayor o igual a I
-    I_normalizada = next((i for i in intensidades_normalizadas if i >= I), None)
-
+    
     # Cálculo de la caída de tensión
     Vd = (2 * rho * L * I * COS) / S_normalizada
     
