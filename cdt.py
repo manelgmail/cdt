@@ -31,6 +31,7 @@ def calcular_caida_tension():
     
     # Mostrar resultado
     print(f"\n🔌 Caída de tensión: {Vd:.2f} V")
+    print(f"Sección: {S:.2f} mm2")
     
     # Opcional: porcentaje de caída respecto a 220V
     volt_nominal = 220
