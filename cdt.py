@@ -25,7 +25,7 @@ def calcular_caida_tension():
         rho = 0.0282  # ohm·mm²/m para aluminio
     else:
         print("Opción inválida. Asignando cobre por defecto.")
-        rho = 0.0175
+        rho = 0.0178
 
     # Cálculo de la caída de tensión
     Vd = (2 * rho * L * I * COS) / A
