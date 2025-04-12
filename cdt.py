@@ -31,9 +31,13 @@ def calcular_caida_tension():
     
     # Lista de secciones normalizadas (en mm²)
     secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
+    intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63]
 
     # Buscar la sección normalizada más cercana mayor o igual a S
     S_normalizada = next((s for s in secciones_normalizadas if s >= S), None)
+    
+    # Buscar la intensidad normalizada más cercana mayor o igual a I
+    I_normalizada = next((i for i in intensidades_normalizadas if i >= I), None)
 
     # Mostrar resultado
     print(f"\n🔌 Caída de tensión: {Vd:.2f} V")
@@ -42,6 +46,12 @@ def calcular_caida_tension():
         print(f" Sección normalizada: {S_normalizada} mm2")
     else:
         print("⚠️ No se encontró una sección normalizada adecuada.")
+    
+    print(f" Intensidad calculada: {I:.2f} A")
+    if I_normalizada:
+        print(f" Intensidad normalizada: {I_normalizada} A")
+    else:
+        print("⚠️ No se encontró una intensidad normalizada adecuada.")
 
     # Opcional: porcentaje de caída respecto a 220V
     volt_nominal = 220
