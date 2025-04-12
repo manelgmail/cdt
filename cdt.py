@@ -29,10 +29,20 @@ def calcular_caida_tension():
     # Cálculo de la caída de tensión
     Vd = (2 * rho * L * I * COS) / S
     
+    # Lista de secciones normalizadas (en mm²)
+    secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
+
+    # Buscar la sección normalizada más cercana mayor o igual a S
+    S_normalizada = next((s for s in secciones_normalizadas if s >= S), None)
+
     # Mostrar resultado
     print(f"\n🔌 Caída de tensión: {Vd:.2f} V")
-    print(f" Sección: {S:.2f} mm2")
-    
+    print(f" Sección calculada: {S:.2f} mm2")
+    if S_normalizada:
+        print(f" Sección normalizada: {S_normalizada} mm2")
+    else:
+        print("⚠️ No se encontró una sección normalizada adecuada.")
+
     # Opcional: porcentaje de caída respecto a 220V
     volt_nominal = 220
     porcentaje = (Vd / volt_nominal) * 100
