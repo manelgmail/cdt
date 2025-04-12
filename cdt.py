@@ -1,23 +1,19 @@
 def calcular_caida_tension():
     print("🧮 CÁLCULO DE CAÍDA DE TENSIÓN EN CABLES")
 
-    # Calculo Intensidad
+    # Entrada de datos
+    L = float(input("Ingrese la longitud del cable (m): "))   
     W = float(input("Ingrese Wattios (W): "))
     COS = float(input("Ingrese valor COS: "))
     
     # Calcular intensidad 
     I = W / (230 * COS)
-    
-    # Entrada de datos
-    L = float(input("Ingrese la longitud del cable (m): "))
-    A = float(input("Ingrese la sección del cable (mm^2): "))
-    
-    
+
     print("Tipo de material:")
     print("1 - Cobre")
     print("2 - Aluminio")
     M = int(input("Seleccione el material (1 o 2): "))
-    
+
     # Resistividad según material
     if M == 1:
         rho = 0.0178  # ohm·mm²/m para cobre
@@ -27,8 +23,11 @@ def calcular_caida_tension():
         print("Opción inválida. Asignando cobre por defecto.")
         rho = 0.0178
 
+    # Calcular Sección    
+    S = (2 * rho * L * I * COS) / 2.3
+    
     # Cálculo de la caída de tensión
-    Vd = (2 * rho * L * I * COS) / A
+    Vd = (2 * rho * L * I * COS) / S
     
     # Mostrar resultado
     print(f"\n🔌 Caída de tensión: {Vd:.2f} V")
