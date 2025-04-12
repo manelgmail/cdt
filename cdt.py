@@ -24,10 +24,7 @@ def calcular_caida_tension():
         rho = 0.0178
 
     # Calcular Sección    
-    S = (2 * rho * L * I * COS) / 2.3
-    
-    # Cálculo de la caída de tensión
-    Vd = (2 * rho * L * I * COS) / S
+    S = (2 * rho * L * I_normalizada * COS) / 2.3
     
     # Lista de secciones normalizadas (en mm²)
     secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
@@ -39,6 +36,9 @@ def calcular_caida_tension():
     # Buscar la intensidad normalizada más cercana mayor o igual a I
     I_normalizada = next((i for i in intensidades_normalizadas if i >= I), None)
 
+    # Cálculo de la caída de tensión
+    Vd = (2 * rho * L * I * COS) / S_normalizada
+    
     # Mostrar resultado
     print(f"\n🔌 Caída de tensión: {Vd:.2f} V")
     print(f" Sección calculada: {S:.2f} mm2")
