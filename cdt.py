@@ -3,15 +3,15 @@ def calcular_caida_tension():
 
     # Calculo Intensidad
     W = float(input("Ingrese Wattios (W): "))
-
+    COS = float(input("Ingrese valor COS: "))
+    
     # Calcular intensidad 
-    I = W / 
+    I = W / (230 * COS)
     
     # Entrada de datos
-    I = float(input("Ingrese la corriente (A): "))
     L = float(input("Ingrese la longitud del cable (m): "))
     A = float(input("Ingrese la sección del cable (mm^2): "))
-    COS = float(input("Ingrese valor COS: "))
+    
     
     print("Tipo de material:")
     print("1 - Cobre")
