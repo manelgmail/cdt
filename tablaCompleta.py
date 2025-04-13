@@ -31,7 +31,6 @@ tabla = {
 }
 
 def calcular_seccion(metodo, tipo_cable, intensidad_requerida):
-    tabla = obtener_tabla()
     clave = (metodo, tipo_cable)
     if clave not in tabla:
         return f"❌ No hay datos para el método '{metodo}' y tipo de cable '{tipo_cable}'"
@@ -53,7 +52,7 @@ def menu():
         print("⚠️ La intensidad debe ser un número.")
         return
     resultado = calcular_seccion(metodo, tipo, intensidad)
-    print("\\n" + resultado)
+    print("\n" + resultado)
 
 if __name__ == "__main__":
     menu()
