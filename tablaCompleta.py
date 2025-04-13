@@ -43,29 +43,51 @@ tabla = {
     ("F", "2xXLPE"): {25: 146, 35: 182, 50: 220, 70: 282, 95: 343, 120: 397, 150: 458, 185: 523, 240: 617},
 }
 
-def calcular_seccion(metodo, tipo_cable, intensidad_requerida):
-    clave = (metodo, tipo_cable)
+def obtener_seccion(metodo, tipo_cable, intensidad_requerida):
+    clave = (metodo.upper(), tipo_cable)
     if clave not in tabla:
-        return f"❌ No hay datos para el método '{metodo}' y tipo de cable '{tipo_cable}'"
+        raise ValueError(f"No hay datos para el método '{metodo}' y tipo de cable '{tipo_cable}'")
     
     opciones = tabla[clave]
     for seccion, intensidad in sorted(opciones.items()):
         if intensidad >= intensidad_requerida:
-            return f"✅ Sección mínima necesaria: {seccion} mm² (Soporta {intensidad} A)"
+            return seccion, intensidad
     
-    return "❌ Ninguna sección disponible soporta esa intensidad"
+    raise ValueError("Ninguna sección disponible soporta esa intensidad")
 
-def menu():
-    print("📐 Cálculo de sección mínima de conductor (tabla ampliada)")
-    metodo = input("Método de instalación (ej. B1, C, D...): ").strip()
-    tipo = input("Tipo de cable (ej. 2xPVC, 3xXLPE): ").replace(" ", "")
+def calcular_caida_tension():
+    print("🧮 CÁLCULO DE CAÍDA DE TENSIÓN EN CABLES")
+
+    L = float(input("Ingrese la longitud del cable (m): "))
+    W = float(input("Ingrese Wattios (W): "))
+    COS = float(input("Ingrese valor COS: "))
+    metodo = input("Método de instalación (ej. B1): ").strip()
+    tipo = input("Tipo de cable (ej. 3xXLPE): ").strip()
+
+    I = W / (230 * COS)
+
+    print("Tipo de material:")
+    print("1 - Cobre")
+    print("2 - Aluminio")
+    M = int(input("Seleccione el material (1 o 2): "))
+
+    rho = 0.0178 if M == 1 else 0.0282
+
     try:
-        intensidad = float(input("Intensidad requerida (A): "))
-    except ValueError:
-        print("⚠️ La intensidad debe ser un número.")
+        seccion_norm, intensidad_tabla = obtener_seccion(metodo, tipo, I)
+    except ValueError as e:
+        print(f"❌ Error: {e}")
         return
-    resultado = calcular_seccion(metodo, tipo, intensidad)
-    print("\n" + resultado)
+
+    S = (2 * rho * L * I * COS) / 2.3
+    Vd = (2 * rho * L * I * COS) / seccion_norm
+    porcentaje = (Vd / 230) * 100
+
+    print(f"\\n🔌 Caída de tensión: {Vd:.2f} V")
+    print(f" Sección calculada (teórica): {S:.2f} mm²")
+    print(f" Sección normalizada usada: {seccion_norm} mm² (soporta hasta {intensidad_tabla} A)")
+    print(f" Intensidad calculada: {I:.2f} A")
+    print(f"📉 Porcentaje respecto a 230V: {porcentaje:.2f}%")
 
 if __name__ == "__main__":
-    menu()
+    calcular_caida_tension()
