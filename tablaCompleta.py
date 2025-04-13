@@ -30,20 +30,30 @@ tabla = {
     ("F", "2xXLPE"): {1.5: 23, 2.5: 31, 4: 41, 6: 52, 10: 72, 16: 97, 25: 125, 35: 150, 50: 179, 70: 222, 95: 267, 120: 305, 150: 349, 185: 400, 240: 472},
 }
 
-def calcular_seccion(metodo, tipo_cable, intensidad):
-    clave = (metodo.upper(), tipo_cable)
+def calcular_seccion(metodo, tipo_cable, intensidad_requerida):
+    tabla = obtener_tabla()
+    clave = (metodo, tipo_cable)
     if clave not in tabla:
-        return f"❌ No se encuentra la combinación '{metodo} - {tipo_cable}' en la tabla."
+        return f"❌ No hay datos para el método '{metodo}' y tipo de cable '{tipo_cable}'"
     
-    for seccion, intensidad_max in sorted(tabla[clave].items()):
-        if intensidad <= intensidad_max:
-            return f"✅ Sección mínima para {metodo} con {tipo_cable} y {intensidad} A: {seccion} mm² (soporta hasta {intensidad_max} A)"
+    opciones = tabla[clave]
+    for seccion, intensidad in sorted(opciones.items()):
+        if intensidad >= intensidad_requerida:
+            return f"✅ Sección mínima necesaria: {seccion} mm² (Soporta {intensidad} A)"
     
-    return "❌ No hay sección disponible que soporte esa intensidad en esta combinación."
+    return "❌ Ninguna sección disponible soporta esa intensidad"
 
-# Preguntas al usuario
+def menu():
+    print("📐 Cálculo de sección mínima de conductor (tabla ampliada)")
+    metodo = input("Método de instalación (ej. B1, C, D...): ").strip()
+    tipo = input("Tipo de cable (ej. 2xPVC, 3xXLPE): ").replace(" ", "")
+    try:
+        intensidad = float(input("Intensidad requerida (A): "))
+    except ValueError:
+        print("⚠️ La intensidad debe ser un número.")
+        return
+    resultado = calcular_seccion(metodo, tipo, intensidad)
+    print("\\n" + resultado)
+
 if __name__ == "__main__":
-    metodo = input("Método de instalación (ej. B1): ").strip()
-    tipo = input("Tipo de cable (ej. 3xPVC, 2xXLPE...): ").strip()
-    intensidad = float(input("Intensidad en amperios (A): ").strip())
-    print(calcular_seccion(metodo, tipo, intensidad))
+    menu()
