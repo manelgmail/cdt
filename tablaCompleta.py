@@ -43,7 +43,7 @@ tabla = {
     ("F", "2xXLPE"): {25: 146, 35: 182, 50: 220, 70: 282, 95: 343, 120: 397, 150: 458, 185: 523, 240: 617},
 }
 
-def obtener_seccion(metodo, tipo_cable, intensidad_requerida):
+ef obtener_seccion(metodo, tipo_cable, intensidad_requerida):
     clave = (metodo.upper(), tipo_cable)
     if clave not in tabla:
         raise ValueError(f"No hay datos para el método '{metodo}' y tipo de cable '{tipo_cable}'")
@@ -66,6 +66,10 @@ def calcular_caida_tension():
 
     I = W / (230 * COS)
 
+    # Intensidades e IGA normalizadas
+    intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63]
+    I_normalizada = next((i for i in intensidades_normalizadas if i >= I), None)
+
     print("Tipo de material:")
     print("1 - Cobre")
     print("2 - Aluminio")
@@ -74,19 +78,26 @@ def calcular_caida_tension():
     rho = 0.0178 if M == 1 else 0.0282
 
     try:
-        seccion_norm, intensidad_tabla = obtener_seccion(metodo, tipo, I)
+        seccion_norm, intensidad_norm = obtener_seccion(metodo, tipo, I)
     except ValueError as e:
         print(f"❌ Error: {e}")
         return
 
-    S = (2 * rho * L * I * COS) / 2.3
-    Vd = (2 * rho * L * I * COS) / seccion_norm
+    S_teorica = (2 * rho * L * I * COS) / 2.3
+
+    # Secciones normalizadas
+    secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240]
+    S_normalizada = next((s for s in secciones_normalizadas if s >= S_teorica), None)
+
+    Vd = (2 * rho * L * I * COS) / S_normalizada
     porcentaje = (Vd / 230) * 100
 
-    print(f"\\n🔌 Caída de tensión: {Vd:.2f} V")
-    print(f" Sección calculada (teórica): {S:.2f} mm²")
-    print(f" Sección normalizada usada: {seccion_norm} mm² (soporta hasta {intensidad_tabla} A)")
-    print(f" Intensidad calculada: {I:.2f} A")
+    print(f"\n🔌 Caída de tensión: {Vd:.2f} V")
+    print(f"📏 Sección teórica calculada: {S_teorica:.2f} mm²")
+    print(f"📏 Sección normalizada usada: {S_normalizada} mm²")
+    print(f"📏 Sección según tabla: {seccion_norm} mm² (soporta hasta {intensidad_norm} A)")
+    print(f"⚡ Intensidad calculada: {I:.2f} A")
+    print(f"⚡ Intensidad normalizada usada: {I_normalizada} A")
     print(f"📉 Porcentaje respecto a 230V: {porcentaje:.2f}%")
 
 if __name__ == "__main__":
