@@ -1,4 +1,4 @@
-# Diccionario con la tabla completa
+# Tabla completa de intensidades máximas admisibles
 tabla = {
     # A1
     ("A1", "3xPVC"): {1.5: 11, 2.5: 15, 4: 20, 6: 26, 10: 36, 16: 47, 25: 63, 35: 77, 50: 93, 70: 119, 95: 145, 120: 167, 150: 192, 185: 220, 240: 263},
@@ -26,22 +26,24 @@ tabla = {
     ("E", "2xXLPE"): {1.5: 21, 2.5: 30, 4: 39, 6: 50, 10: 69, 16: 94, 25: 122, 35: 147, 50: 175, 70: 218, 95: 261, 120: 299, 150: 341, 185: 392, 240: 463},
 
     # F
+    ("F", "3xXLPE"): {1.5: 21, 2.5: 30, 4: 40, 6: 51, 10: 70, 16: 94, 25: 121, 35: 145, 50: 173, 70: 216, 95: 260, 120: 297, 150: 338, 185: 387, 240: 457},
     ("F", "2xXLPE"): {1.5: 23, 2.5: 31, 4: 41, 6: 52, 10: 72, 16: 97, 25: 125, 35: 150, 50: 179, 70: 222, 95: 267, 120: 305, 150: 349, 185: 400, 240: 472},
-    ("F", "3xXLPE"): {1.5: 21, 2.5: 30, 4: 40, 6: 51, 10: 70, 16: 94, 25: 121, 35: 145, 50: 173, 70: 216, 95: 260, 120: 297, 150: 338, 185: 387, 240: 457}
 }
-
 
 def calcular_seccion(metodo, tipo_cable, intensidad):
     clave = (metodo.upper(), tipo_cable)
     if clave not in tabla:
-        return f"No se encuentra la combinación '{metodo} - {tipo_cable}' en la tabla."
+        return f"❌ No se encuentra la combinación '{metodo} - {tipo_cable}' en la tabla."
     
     for seccion, intensidad_max in sorted(tabla[clave].items()):
         if intensidad <= intensidad_max:
-            return f"Sección mínima para {metodo} con {tipo_cable} y {intensidad}A: {seccion} mm² (soporta hasta {intensidad_max} A)"
+            return f"✅ Sección mínima para {metodo} con {tipo_cable} y {intensidad} A: {seccion} mm² (soporta hasta {intensidad_max} A)"
     
-    return "No hay sección disponible que soporte esa intensidad en esta combinación."
+    return "❌ No hay sección disponible que soporte esa intensidad en esta combinación."
 
-
-# Ejemplo de uso
-print(calcular_seccion("B1", "3xXLPE", 58))  # Debería devolver 16 mm² (77A)
+# Preguntas al usuario
+if __name__ == "__main__":
+    metodo = input("Método de instalación (ej. B1): ").strip()
+    tipo = input("Tipo de cable (ej. 3xPVC, 2xXLPE...): ").strip()
+    intensidad = float(input("Intensidad en amperios (A): ").strip())
+    print(calcular_seccion(metodo, tipo, intensidad))
