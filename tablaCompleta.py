@@ -43,7 +43,7 @@ tabla = {
     ("F", "2xXLPE"): {25: 146, 35: 182, 50: 220, 70: 282, 95: 343, 120: 397, 150: 458, 185: 523, 240: 617},
 }
 
-ef obtener_seccion(metodo, tipo_cable, intensidad_requerida):
+def obtener_seccion(metodo, tipo_cable, intensidad_requerida):
     clave = (metodo.upper(), tipo_cable)
     if clave not in tabla:
         raise ValueError(f"No hay datos para el método '{metodo}' y tipo de cable '{tipo_cable}'")
