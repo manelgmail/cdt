@@ -22,8 +22,10 @@ def calcular_caida_tension():
     else:
         print("Opción inválida. Asignando cobre por defecto.")
         rho = 0.0178
+    
     # Lista intensidades normalizadas IGA
     intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63]
+    
     # Buscar la intensidad normalizada más cercana mayor o igual a I
     I_normalizada = next((i for i in intensidades_normalizadas if i >= I), None)
 
