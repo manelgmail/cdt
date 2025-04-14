@@ -1,0 +1,66 @@
+function calcularSeccion() {
+  const metodo = document.getElementById('metodo').value;
+  const tipo = document.getElementById('tipo').value;
+  const L = parseFloat(document.getElementById('longitud').value);
+  const W = parseFloat(document.getElementById('potencia').value);
+  const COS = parseFloat(document.getElementById('coseno').value);
+  const material = document.getElementById('material').value;
+
+  const resultado = document.getElementById('resultado');
+
+  // Validate inputs
+  if (isNaN(L) || isNaN(W) || isNaN(COS)) {
+    resultado.innerHTML = "❌ Por favor, ingrese todos los valores correctamente.";
+    return;
+  }
+
+  // Calculate current (I)
+  const I = W / (230 * COS);
+
+  // Get resistivity based on material
+  const rho = material === 'CU' ? 0.0178 : 0.0282;
+
+  // Access the correct table section
+  const secciones = tabla[`${metodo},${tipo}`];
+  if (!secciones) {
+    resultado.innerHTML = "❌ Método o tipo de cable no válido.";
+    return;
+  }
+
+  // Sort by section sizes and find the first match
+  const sorted = Object.entries(secciones).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
+  const encontrado = sorted.find(([seccion, intensidadMax]) => intensidadMax >= I);
+
+  // Normalize current and section values
+  const intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63];
+  const I_normalizada = intensidades_normalizadas.find(i => i >= I) || "No encontrado";
+
+  const S_teorica = (2 * rho * L * I * COS) / 2.3;
+  const secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
+  const S_normalizada = secciones_normalizadas.find(s => s >= S_teorica);
+
+  // Validate normalized section
+  if (!S_normalizada || isNaN(S_normalizada)) {
+    resultado.innerHTML = "❌ No se puede calcular la caída de tensión.";
+    return;
+  }
+
+  // Calculate voltage drop and percentage
+  const Vd = (2 * rho * L * I * COS) / S_normalizada;
+  const porcentaje = (Vd / 230) * 100;
+
+  // Display results
+  if (encontrado) {
+    resultado.innerHTML = `
+      ✅ Intensidad calculada: <strong>${I.toFixed(2)} A</strong><br>
+      ✅ Intensidad normalizada (IGA): <strong>${I_normalizada} A</strong><br>
+      ✅ Sección mínima según tabla: <strong>${encontrado[0]} mm²</strong> (soporta hasta ${encontrado[1]} A)<br>
+      ✅ Sección teórica por caída de tensión: <strong>${S_teorica.toFixed(2)} mm²</strong><br>
+      ✅ Sección normalizada: <strong>${S_normalizada} mm²</strong><br>
+      ⚡ Caída de tensión: <strong>${Vd.toFixed(2)} V</strong><br>
+      📉 Porcentaje de caída respecto a 230V: <strong>${porcentaje.toFixed(2)}%</strong>
+    `;
+  } else {
+    resultado.innerHTML = `❌ Ninguna sección encontrada para ${I.toFixed(2)} A.`;
+  }
+}
