@@ -93,12 +93,11 @@
       "F": {
         "3xPVC": { 1.5: 17, 2.5: 23, 4: 31, 6: 40, 10: 54, 16: 73, 25: 95, 35: 119, 50: 145, 70: 185, 95: 224, 120: 260, 150: 299, 185: 341, 240: 401 },
         "2xPVC": { 1.5: 20, 2.5: 26, 4: 36, 6: 46, 10: 65, 16: 87, 25: 110, 35: 137, 50: 167, 70: 214, 95: 259, 120: 301, 150: 343, 185: 391, 240: 468 },
-        "3xXLPE": { 1.5: 21, 2xXLPE: 30, 4: 40, 6: 52, 10: 72, 16: 97, 25: 122, 35: 153, 50: 188, 70: 243, 95: 298, 120: 350, 150: 401, 185: 460, 240: 545 },
+        "3xXLPE": { 1.5: 21, 2.5: 30, 4: 40, 6: 52, 10: 72, 16: 97, 25: 122, 35: 153, 50: 188, 70: 243, 95: 298, 120: 350, 150: 401, 185: 460, 240: 545 },
         "2xXLPE": { 25: 146, 35: 182, 50: 220, 70: 282, 95: 343, 120: 397, 150: 458, 185: 523, 240: 617 }
       }
     };
 
-    // Función para calcular la sección del cable
     function calcularSeccion() {
       const metodo = document.getElementById('metodo').value;
       const tipo = document.getElementById('tipo').value;
@@ -110,24 +109,19 @@
       const resultado = document.getElementById('resultado');
       const I = W / (230 * COS); // Intensidad calculada
 
-      // Resistividad según el material
       const rho = material === 'CU' ? 0.0178 : 0.0282;
 
-      // Accedemos a las secciones según método y tipo
       const secciones = tabla[metodo][tipo];
       const sorted = Object.entries(secciones).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
       const encontrado = sorted.find(([seccion, intensidadMax]) => intensidadMax >= I);
 
-      // Intensidades normalizadas (IGA)
       const intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63];
       const I_normalizada = intensidades_normalizadas.find(i => i >= I);
 
-      // Cálculo de la sección teórica por caída de tensión
       const S_teorica = (2 * rho * L * I * COS) / 2.3;
       const secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
       const S_normalizada = secciones_normalizadas.find(s => s >= S_teorica);
 
-      // Cálculo de la caída de tensión y porcentaje
       const Vd = (2 * rho * L * I * COS) / S_normalizada;
       const porcentaje = (Vd / 230) * 100;
 
@@ -148,3 +142,4 @@
   </script>
 </body>
 </html>
+
