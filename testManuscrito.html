@@ -3,18 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Sección de Cable</title>
+  <title>Calculadora de Sección de Cable - Trabajo Hecho a Mano</title>
+  <!-- Fuente manuscrita -->
+  <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; background: #f4f4f4; }
-    .container { background: #fff; padding: 2em; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; }
-    label { display: block; margin-top: 1em; }
-    select, input, button { width: 100%; padding: 0.5em; margin-top: 0.5em; }
-    #resultado { margin-top: 2em; background: #e6f7ff; padding: 1em; border-left: 4px solid #1890ff; }
-    /* Opcional: para dar un toque "manuscrito" a las fórmulas, se puede usar una fuente similar a handwriting */
-    .math { font-family: "Comic Sans MS", "Chalkboard", cursive; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background: #f4f4f4;
+    }
+    .container {
+      background: #fff;
+      padding: 2em;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.5em;
+    }
+    /* Estilo del bloque de resultados para parecer un trabajo hecho a mano */
+    #resultado {
+      margin-top: 2em;
+      padding: 1em;
+      border: 2px dashed #666;
+      background: #fafafa;
+      font-family: 'Indie Flower', cursive;
+      font-size: 20px;
+      line-height: 1.5;
+      color: #333;
+    }
+    .math {
+      font-family: 'Indie Flower', cursive;
+      font-size: 22px;
+      margin: 0.5em 0;
+    }
   </style>
-  <!-- Incluir MathJax para renderizar notación LaTeX -->
+  <!-- Incluir MathJax para renderizar fórmulas en notación LaTeX -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -58,7 +93,7 @@
   </div>
 
   <script>
-    // Tabla de secciones reestructurada en objeto anidado
+    // Tabla de secciones en objeto anidado
     const tabla = {
       "A1": {
         "3xPVC": { 1.5: 11.5, 2.5: 15.5, 4: 20, 6: 26, 10: 36, 16: 48, 25: 63 },
@@ -139,30 +174,31 @@
       if (encontrado) {
         resultado.innerHTML = `
           <p>✅ Intensidad calculada: <strong>${I.toFixed(2)} A</strong></p>
-          <p class="math">\( I = \\dfrac{W}{230 \\cdot \\cos\\phi} \)</p>
+          <p class="math">\\( I = \\dfrac{W}{230 \\cdot \\cos\\phi} \\)</p>
           
           <p>✅ Intensidad normalizada (IGA): <strong>${I_normalizada} A</strong></p>
           
-          <p>✅ Sección mínima según tabla: <strong>${encontrado[0]} mm²</strong> <br>
+          <p>✅ Sección mínima según tabla: <strong>${encontrado[0]} mm²</strong><br>
              (Soporta hasta <strong>${encontrado[1]} A</strong>)</p>
           
           <p>✅ Sección teórica por caída de tensión: <strong>${S_teorica.toFixed(2)} mm²</strong></p>
-          <p class="math">\( S_{teo} = \\dfrac{2 \\rho L I \\cos\\phi}{2.3} \)</p>
+          <p class="math">\\( S_{teo} = \\dfrac{2\\, \\rho\\, L\\, I\\, \\cos\\phi}{2.3} \\)</p>
           
           <p>✅ Sección normalizada: <strong>${S_normalizada} mm²</strong></p>
           
           <p>⚡ Caída de tensión: <strong>${Vd.toFixed(2)} V</strong></p>
-          <p class="math">\( V_d = \\dfrac{2 \\rho L I \\cos\\phi}{S_{norm}} \)</p>
+          <p class="math">\\( V_d = \\dfrac{2\\, \\rho\\, L\\, I\\, \\cos\\phi}{S_{norm}} \\)</p>
           
           <p>📉 Porcentaje de caída respecto a 230V: <strong>${porcentaje.toFixed(2)}%</strong></p>
-          <p class="math">\( \\% = \\dfrac{V_d}{230} \\times 100\\% \)</p>
+          <p class="math">\\( \\% = \\dfrac{V_d}{230} \\times 100\\% \\)</p>
         `;
       } else {
         resultado.innerHTML = `<p>❌ Ninguna sección encontrada para ${I.toFixed(2)} A.</p>`;
       }
-      // Forzamos la re-renderización de MathJax en el contenido dinámico.
+      // Re-renderiza MathJax para procesar las fórmulas en el contenido dinámico.
       MathJax.typeset();
     }
   </script>
 </body>
 </html>
+
