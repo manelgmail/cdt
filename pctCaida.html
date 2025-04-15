@@ -204,6 +204,7 @@
         I = W / (Math.sqrt(3) * baseVoltage * COS);
       }
 
+      const I_normalizada = getIGA(I);
       const rho = materialResistivity(material);
       
       // Calculamos la caída permitida en voltios según el porcentaje
@@ -214,9 +215,9 @@
       // Trifásico: S_teo = (√3 * ρ * L * I * cos φ) / (Caída Permitida)
       let S_teorica;
       if (sistema === "mono") {
-        S_teorica = (2 * rho * L * I * COS) / dropAllowed;
+        S_teorica = (2 * rho * L * I_normalizada * COS) / dropAllowed;
       } else {
-        S_teorica = (Math.sqrt(3) * rho * L * I * COS) / dropAllowed;
+        S_teorica = (Math.sqrt(3) * rho * L * I_normalizada * COS) / dropAllowed;
       }
       
       // Sección normalizada se selecciona de una lista estándar
@@ -226,9 +227,9 @@
       // Caída de tensión según el sistema:
       let Vd;
       if (sistema === "mono") {
-        Vd = (2 * rho * L * I * COS) / S_normalizada;
+        Vd = (2 * rho * L * I_normalizada * COS) / S_normalizada;
       } else {
-        Vd = (Math.sqrt(3) * rho * L * I * COS) / S_normalizada;
+        Vd = (Math.sqrt(3) * rho * L * I_normalizada * COS) / S_normalizada;
       }
       const porcentaje = (Vd / baseVoltage) * 100;
 
