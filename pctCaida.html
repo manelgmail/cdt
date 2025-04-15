@@ -20,7 +20,15 @@
       margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h1 { text-align: center; }
+    h1 { 
+      text-align: center; 
+    }
+    h2 {
+      text-align: center;
+      font-size: 1.2em;
+      color: #555;
+      margin-top: 0.2em;
+    }
     label { display: block; margin-top: 1em; }
     select, input, button {
       width: 100%;
@@ -52,13 +60,14 @@
 <body>
   <div class="container">
     <h1>Calculadora de Sección de Cable</h1>
+    <h2>Curso Elec-25 Vedruna Navas</h2>
     
-    <!-- Menú para seleccionar el porcentaje de caída de tensión permitido -->
+    <!-- Menú para seleccionar el porcentaje de caída de tensión permitida -->
     <label for="pctCaida">Porcentaje de caída de tensión permitida:</label>
     <select id="pctCaida">
       <option value="1.5">CPM a DI (1.5%)</option>
       <option value="3">Ins. Int Alum. (3%)</option>
-      <option value="5">Demás Usos (5%)</option>
+      <option value="5">Demas Usos (5%)</option>
       <option value="3">Vivienda (3%)</option>
       <option value="0.5">LGA (0.5%)</option>
       <option value="1">CC única DI (1%)</option>
@@ -132,7 +141,7 @@
       // Recuperamos los valores del formulario
       const pctCaida = parseFloat(document.getElementById('pctCaida').value);      
       const sistema = document.getElementById('sistema').value;
-      const metodo = document.getElementById('metodo').value;  // Aunque solo es A1
+      const metodo = document.getElementById('metodo').value;  // Solo A1
       const tipo = document.getElementById('tipo').value;
       const L = parseFloat(document.getElementById('longitud').value);
       const W = parseFloat(document.getElementById('potencia').value);
@@ -151,12 +160,12 @@
 
       const rho = materialResistivity(material);
       
-      // Calculamos la caída permitida (en voltios) según el porcentaje seleccionado
+      // Calculamos la caída permitida en voltios según el porcentaje
       const dropAllowed = (pctCaida / 100) * baseVoltage;
       
       // Sección teórica según el sistema:
-      // Para monofásico: S_teo = (2 * ρ * L * I * cos φ) / caída permitida
-      // Para trifásico: S_teo = (√3 * ρ * L * I * cos φ) / caída permitida
+      // Monofásico: S_teo = (2 * ρ * L * I * cos φ) / (Caída Permitida)
+      // Trifásico: S_teo = (√3 * ρ * L * I * cos φ) / (Caída Permitida)
       let S_teorica;
       if (sistema === "mono") {
         S_teorica = (2 * rho * L * I * COS) / dropAllowed;
@@ -164,11 +173,11 @@
         S_teorica = (Math.sqrt(3) * rho * L * I * COS) / dropAllowed;
       }
       
-      // Sección normalizada de entre valores comunes
+      // Sección normalizada se selecciona de una lista estándar
       const secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
       const S_normalizada = secciones_normalizadas.find(s => s >= S_teorica);
 
-      // Caída de tensión calculada:
+      // Caída de tensión según el sistema:
       let Vd;
       if (sistema === "mono") {
         Vd = (2 * rho * L * I * COS) / S_normalizada;
@@ -182,11 +191,10 @@
       const sorted = Object.entries(secciones).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
       const encontrado = sorted.find(([seccion, intensidadMax]) => intensidadMax >= I);
 
-      // Presentamos los resultados utilizando MathJax para las fórmulas
       if (encontrado) {
         resultado.innerHTML = `
           <p>✅ Intensidad calculada: <strong>${I.toFixed(2)} A</strong></p>
-          <p class="math">\\( I = \\dfrac{W}{${sistema==="mono" ? "230" : "\\sqrt{3} \\cdot 400"}\\, \\cos\\phi} \\)</p>
+          <p class="math">\\( I = \\dfrac{W}{${sistema==="mono" ? "230" : "\\sqrt{3}\\,\\cdot\\,400"}\\, \\cos\\phi} \\)</p>
           
           <p>✅ Intensidad normalizada (IGA): <strong>${getIGA(I)} A</strong></p>
           
@@ -195,15 +203,15 @@
           
           <p>✅ Sección teórica por caída de tensión: <strong>${S_teorica.toFixed(2)} mm²</strong></p>
           <p class="math">${sistema==="mono" ? 
-             `\\( S_{teo} = \\dfrac{2 \\; \\rho \\; L \\; I \\; \\cos\\phi}{${pctCaida}\\% \\; \\cdot \\; 230/100} \\)` :
-             `\\( S_{teo} = \\dfrac{\\sqrt{3} \\; \\rho \\; L \\; I \\; \\cos\\phi}{${pctCaida}\\% \\; \\cdot \\; 400/100} \\)`}</p>
+             `\\( S_{teo} = \\dfrac{2\\, \\rho\\, L\\, I\\, \\cos\\phi}{(${pctCaida}\\%\\,\\cdot\\,230/100)} \\)` :
+             `\\( S_{teo} = \\dfrac{\\sqrt{3}\\, \\rho\\, L\\, I\\, \\cos\\phi}{(${pctCaida}\\%\\,\\cdot\\,400/100)} \\)`}</p>
           
           <p>✅ Sección normalizada: <strong>${S_normalizada} mm²</strong></p>
           
           <p>⚡ Caída de tensión: <strong>${Vd.toFixed(2)} V</strong></p>
           <p class="math">${sistema==="mono" ? 
-             "\\( V_d = \\dfrac{2 \\; \\rho \\; L \\; I \\; \\cos\\phi}{S_{norm}} \\)" :
-             "\\( V_d = \\dfrac{\\sqrt{3} \\; \\rho \\; L \\; I \\; \\cos\\phi}{S_{norm}} \\)"}</p>
+             "\\( V_d = \\dfrac{2\\, \\rho\\, L\\, I\\, \\cos\\phi}{S_{norm}} \\)" :
+             "\\( V_d = \\dfrac{\\sqrt{3}\\, \\rho\\, L\\, I\\, \\cos\\phi}{S_{norm}} \\)"}</p>
           
           <p>📉 Porcentaje de caída respecto a ${baseVoltage} V: <strong>${porcentaje.toFixed(2)}%</strong></p>
           <p class="math">\\( \\% = \\dfrac{V_d}{${baseVoltage}} \\times 100\\% \\)</p>
@@ -217,4 +225,3 @@
   </script>
 </body>
 </html>
-
