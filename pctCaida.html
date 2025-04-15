@@ -214,9 +214,9 @@
       // Trifásico: S_teo = (√3 * ρ * L * I * cos φ) / (Caída Permitida)
       let S_teorica;
       if (sistema === "mono") {
-        S_teorica = (2 * rho * L * I * COS) / dropAllowed;
+        S_teorica = (2 * rho * L * getIGA * COS) / dropAllowed;
       } else {
-        S_teorica = (Math.sqrt(3) * rho * L * I * COS) / dropAllowed;
+        S_teorica = (Math.sqrt(3) * rho * L * getIGA * COS) / dropAllowed;
       }
       
       // Sección normalizada se selecciona de una lista estándar
