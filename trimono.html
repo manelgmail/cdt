@@ -7,11 +7,31 @@
   <!-- Fuente manuscrita para resultados, opcional -->
   <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; background: #f4f4f4; }
-    .container { background: #fff; padding: 2em; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; }
-    label { display: block; margin-top: 1em; }
-    select, input, button { width: 100%; padding: 0.5em; margin-top: 0.5em; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background: #f4f4f4;
+    }
+    .container {
+      background: #fff;
+      padding: 2em;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.5em;
+    }
     /* Estilo para el bloque de resultados (opcional) */
     #resultado {
       margin-top: 2em;
@@ -31,14 +51,14 @@
   </style>
   <!-- Incluir MathJax para renderizar notación LaTeX -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async
+  <script id="MathJax-script" async 
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Calculadora de Sección de Cable</h1>
     
-    <!-- Selección del sistema -->
+    <!-- Selección del sistema: Monofásico o Trifásico -->
     <label for="sistema">Tipo de sistema:</label>
     <select id="sistema">
       <option value="mono">Monofásico</option>
@@ -80,7 +100,7 @@
   </div>
 
   <script>
-    // Tabla de secciones reestructurada (se usa la misma tabla para mono y trifásico)
+    // Tabla de secciones reestructurada en objeto anidado (se usa la misma tabla para mono y trifásico)
     const tabla = {
       "A1": {
         "3xPVC": { 1.5: 11.5, 2.5: 15.5, 4: 20, 6: 26, 10: 36, 16: 48, 25: 63 },
@@ -127,7 +147,7 @@
     };
 
     function calcularSeccion() {
-      // Recuperamos el valor del select para sistema
+      // Recuperar el valor del select para sistema
       const sistema = document.getElementById('sistema').value;
       const metodo = document.getElementById('metodo').value;
       const tipo = document.getElementById('tipo').value;
@@ -167,7 +187,7 @@
       if (encontrado) {
         resultado.innerHTML = `
           <p>✅ Intensidad calculada: <strong>${I.toFixed(2)} A</strong></p>
-          <p class="math">\\( I = \\dfrac{W}{${sistema==="mono" ? "230" : "\\sqrt{3} \\cdot 400"} \\cdot \\cos\\phi} \\)</p>
+          <p class="math">\\( I = \\dfrac{W}{${sistema === "mono" ? "230" : "\\sqrt{3} \\cdot 400"} \\cdot \\cos\\phi} \\)</p>
           
           <p>✅ Intensidad normalizada (IGA): <strong>${I_normalizada} A</strong></p>
           
@@ -194,4 +214,3 @@
   </script>
 </body>
 </html>
-
