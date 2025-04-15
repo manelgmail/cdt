@@ -20,13 +20,8 @@
       margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h1 {
-      text-align: center;
-    }
-    label {
-      display: block;
-      margin-top: 1em;
-    }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 1em; }
     select, input, button {
       width: 100%;
       padding: 0.5em;
@@ -51,14 +46,14 @@
   </style>
   <!-- Incluir MathJax para renderizar notación LaTeX -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async 
+  <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Calculadora de Sección de Cable</h1>
     
-    <!-- Selección del sistema: Monofásico o Trifásico -->
+    <!-- Selección del sistema: Mono o Trifásico -->
     <label for="sistema">Tipo de sistema:</label>
     <select id="sistema">
       <option value="mono">Monofásico</option>
@@ -100,7 +95,7 @@
   </div>
 
   <script>
-    // Tabla de secciones reestructurada en objeto anidado (se usa la misma tabla para mono y trifásico)
+    // La tabla de secciones es la misma para ambos casos
     const tabla = {
       "A1": {
         "3xPVC": { 1.5: 11.5, 2.5: 15.5, 4: 20, 6: 26, 10: 36, 16: 48, 25: 63 },
@@ -147,7 +142,7 @@
     };
 
     function calcularSeccion() {
-      // Recuperar el valor del select para sistema
+      // Recuperar el sistema: "mono" o "tri"
       const sistema = document.getElementById('sistema').value;
       const metodo = document.getElementById('metodo').value;
       const tipo = document.getElementById('tipo').value;
@@ -157,14 +152,16 @@
       const material = document.getElementById('material').value;
       const resultado = document.getElementById('resultado');
 
-      let I, baseVoltage, factor;
+      let I, baseVoltage, factor, factorDisplay;
       if (sistema === "mono") {
         baseVoltage = 230;
         factor = 2;
+        factorDisplay = "2";
         I = W / (baseVoltage * COS);
       } else {
         baseVoltage = 400;
         factor = Math.sqrt(3);
+        factorDisplay = "\\sqrt{3}";
         I = W / (factor * baseVoltage * COS);
       }
 
@@ -177,17 +174,19 @@
       const intensidades_normalizadas = [10, 16, 20, 25, 32, 40, 50, 63];
       const I_normalizada = intensidades_normalizadas.find(i => i >= I);
 
+      // Sección teórica: para mono es (2ρLIcosφ)/2.3 y para tri es (√3ρLIcosφ)/2.3
       const S_teorica = (factor * rho * L * I * COS) / 2.3;
       const secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
       const S_normalizada = secciones_normalizadas.find(s => s >= S_teorica);
 
+      // Caída de tensión y porcentaje
       const Vd = (factor * rho * L * I * COS) / S_normalizada;
       const porcentaje = (Vd / baseVoltage) * 100;
 
       if (encontrado) {
         resultado.innerHTML = `
           <p>✅ Intensidad calculada: <strong>${I.toFixed(2)} A</strong></p>
-          <p class="math">\\( I = \\dfrac{W}{${sistema === "mono" ? "230" : "\\sqrt{3} \\cdot 400"} \\cdot \\cos\\phi} \\)</p>
+          <p class="math">\\( I = \\dfrac{W}{${sistema==="mono" ? "230" : "\\sqrt{3} \\cdot 400"} \\cdot \\cos\\phi} \\)</p>
           
           <p>✅ Intensidad normalizada (IGA): <strong>${I_normalizada} A</strong></p>
           
@@ -195,12 +194,12 @@
              (Soporta hasta <strong>${encontrado[1]} A</strong>)</p>
           
           <p>✅ Sección teórica por caída de tensión: <strong>${S_teorica.toFixed(2)} mm²</strong></p>
-          <p class="math">\\( S_{teo} = \\dfrac{${factor.toFixed(2)}\\, \\rho\\, L\\, I \\cos\\phi}{2.3} \\)</p>
+          <p class="math">\\( S_{teo} = \\dfrac{${factorDisplay}\\, \\rho\\, L\\, I \\cos\\phi}{2.3} \\)</p>
           
           <p>✅ Sección normalizada: <strong>${S_normalizada} mm²</strong></p>
           
           <p>⚡ Caída de tensión: <strong>${Vd.toFixed(2)} V</strong></p>
-          <p class="math">\\( V_d = \\dfrac{${factor.toFixed(2)}\\, \\rho\\, L\\, I \\cos\\phi}{S_{norm}} \\)</p>
+          <p class="math">\\( V_d = \\dfrac{${factorDisplay}\\, \\rho\\, L\\, I \\cos\\phi}{S_{norm}} \\)</p>
           
           <p>📉 Porcentaje de caída respecto a ${baseVoltage}V: <strong>${porcentaje.toFixed(2)}%</strong></p>
           <p class="math">\\( \\% = \\dfrac{V_d}{${baseVoltage}} \\times 100\\% \\)</p>
@@ -208,7 +207,6 @@
       } else {
         resultado.innerHTML = `<p>❌ Ninguna sección encontrada para ${I.toFixed(2)} A.</p>`;
       }
-
       MathJax.typeset();
     }
   </script>
