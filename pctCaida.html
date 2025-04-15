@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Sección de Cable - Sección A1</title>
+  <!-- Fuente manuscrita para resultados (opcional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background: #f4f4f4;
+    }
+    .container {
+      background: #fff;
+      padding: 2em;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 1em; }
+    select, input, button {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.5em;
+    }
+    /* Estilo para el bloque de resultados (opcional) */
+    #resultado {
+      margin-top: 2em;
+      padding: 1em;
+      border: 2px dashed #666;
+      background: #fafafa;
+      font-family: 'Indie Flower', cursive;
+      font-size: 20px;
+      line-height: 1.5;
+      color: #333;
+    }
+    .math {
+      font-family: 'Indie Flower', cursive;
+      font-size: 22px;
+      margin: 0.5em 0;
+    }
+  </style>
+  <!-- Incluir MathJax para renderizar notación LaTeX -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async 
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Calculadora de Sección de Cable</h1>
+    
+    <!-- Menú para seleccionar el porcentaje de caída de tensión permitido -->
+    <label for="pctCaida">Porcentaje de caída de tensión permitida:</label>
+    <select id="pctCaida">
+      <option value="1.5">CPM a DI (1.5%)</option>
+      <option value="3">Ins. Int Alum. (3%)</option>
+      <option value="5">Demas Usos (5%)</option>
+      <option value="3">Vivienda (3%)</option>
+      <option value="0.5">LGA (0.5%)</option>
+      <option value="1">CC única DI (1%)</option>
+      <option value="1">LGA varias (1%)</option>
+      <option value="0.5">DI varias (0.5%)</option>
+      <option value="4.5">Indu. Trans. propio Alum. (4.5%)</option>
+      <option value="6.5">Indu. Trans. propio demás usos (6.5%)</option>
+    </select>
+    
+    <!-- Menú para seleccionar el tipo de sistema -->
+    <label for="sistema">Tipo de sistema:</label>
+    <select id="sistema">
+      <option value="mono">Monofásico</option>
+      <option value="tri">Trifásico</option>
+    </select>
+    
+    <!-- Como solo usamos la sección A1, eliminamos el menú de método -->
+    <!-- Menú para seleccionar el tipo de cable -->
+    <label for="tipo">Tipo de cable:</label>
+    <select id="tipo">
+      <option value="2xPVC">2xPVC</option>
+      <option value="3xXLPE">3xXLPE</option>
+    </select>
+
+    <label for="longitud">Longitud del cable (m):</label>
+    <input type="number" id="longitud" step="any">
+
+    <label for="potencia">Potencia (W):</label>
+    <input type="number" id="potencia" step="any">
+
+    <label for="coseno">Cos φ:</label>
+    <input type="number" id="coseno" step="any" value="0.9">
+
+    <label for="material">Material:</label>
+    <select id="material">
+      <option value="CU">Cobre</option>
+      <option value="AL">Aluminio</option>
+    </select>
+
+    <button onclick="calcularSeccion()">Calcular sección</button>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    // Tabla de secciones para A1 (única sección)
+    const tablaA1 = {
+      "3xPVC": { 1.5: 11.5, 2.5: 15.5, 4: 20, 6: 26, 10: 36, 16: 48, 25: 63 },
+      "2xPVC": { 1.5: 12.5, 2.5: 17, 4: 22, 6: 29, 10: 40, 16: 53, 25: 69 },
+      "3xXLPE": { 1.5: 15.5, 2.5: 20, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86, 35: 106, 50: 128, 70: 162, 95: 196, 120: 226, 150: 259, 185: 294, 240: 345 },
+      "2xXLPE": { 1.5: 16.5, 2.5: 22, 4: 30, 6: 39, 10: 54, 16: 72, 25: 91, 35: 114, 50: 139, 70: 178, 95: 216, 120: 251, 150: 289, 185: 329, 240: 385 }
+    };
+
+    // Función auxiliar para obtener la resistividad
+    function materialResistivity(material) {
+      return material === 'CU' ? 0.0178 : 0.0282;
+    }
+
+    // Función auxiliar: Selecciona la intensidad normalizada (IGA) adecuada
+    function getIGA(I) {
+      const intensidades = [10, 16, 20, 25, 32, 40, 50, 63];
+      return intensidades.find(val => val >= I);
+    }
+
+    function calcularSeccion() {
+      // Recuperamos valores del formulario
+      const pctCaida = parseFloat(document.getElementById('pctCaida').value);
+      const sistema = document.getElementById('sistema').value;
+      const tipo = document.getElementById('tipo').value;
+      const L = parseFloat(document.getElementById('longitud').value);
+      const W = parseFloat(document.getElementById('potencia').value);
+      const COS = parseFloat(document.getElementById('coseno').value);
+      const material = document.getElementById('material').value;
+      const resultado = document.getElementById('resultado');
+
+      let I, baseVoltage;
+      if (sistema === "mono") {
+        baseVoltage = 230;
+        I = W / (baseVoltage * COS);
+      } else {
+        baseVoltage = 400;
+        I = W / (Math.sqrt(3) * baseVoltage * COS);
+      }
+
+      const rho = materialResistivity(material);
+      
+      // Calculamos la caída permitida en V según el porcentaje seleccionado
+      const dropAllowed = (pctCaida / 100) * baseVoltage;
+
+      // Calculamos la sección teórica usando la fórmula correspondiente al sistema
+      let S_teorica;
+      if (sistema === "mono") {
+        S_teorica = (2 * rho * L * I * COS) / dropAllowed;
+      } else {
+        S_teorica = (Math.sqrt(3) * rho * L * I * COS) / dropAllowed;
+      }
+      
+      // Sección normalizada se elige de una lista estándar
+      const secciones_normalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
+      const S_normalizada = secciones_normalizadas.find(s => s >= S_teorica);
+
+      // Cálculo de la caída de tensión según sistema
+      let Vd;
+      if (sistema === "mono") {
+        Vd = (2 * rho * L * I * COS) / S_normalizada;
+      } else {
+        Vd = (Math.sqrt(3) * rho * L * I * COS) / S_normalizada;
+      }
+      const porcentaje = (Vd / baseVoltage) * 100;
+
+      // Buscamos en la tabla A1 la sección mínima que soporte la intensidad calculada
+      const secciones = tablaA1[tipo];
+      const sorted = Object.entries(secciones).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
+      const encontrado = sorted.find(([seccion, intensidadMax]) => intensidadMax >= I);
+
+      // Presentamos los resultados y las fórmulas mediante MathJax
+      if (encontrado) {
+        resultado.innerHTML = `
+          <p>✅ Intensidad calculada: <strong>${I.toFixed(2)} A</strong></p>
+          <p class="math">\\( I = \\dfrac{W}{${sistema==="mono" ? "230" : "\\sqrt{3} \\cdot 400"} \\cdot \\cos\\phi} \\)</p>
+          
+          <p>✅ Intensidad normalizada (IGA): <strong>${getIGA(I)} A</strong></p>
+          
+          <p>✅ Sección mínima según tabla (A1): <strong>${encontrado[0]} mm²</strong><br>
+             (Soporta hasta <strong>${encontrado[1]} A</strong>)</p>
+          
+          <p>✅ Sección teórica por caída de tensión: <strong>${S_teorica.toFixed(2)} mm²</strong></p>
+          <p class="math">${sistema==="mono" ? 
+             "\\( S_{teo} = \\dfrac{2\\, \\rho\\, L\\, I\\, \\cos\\phi}{(" + pctCaida + "\\% \\cdot 230/100)} \\)" :
+             "\\( S_{teo} = \\dfrac{\\sqrt{3}\\, \\rho\\, L\\, I\\, \\cos\\phi}{(" + pctCaida + "\\% \\cdot 400/100)} \\)"}</p>
+          
+          <p>✅ Sección normalizada: <strong>${S_normalizada} mm²</strong></p>
+          
+          <p>⚡ Caída de tensión: <strong>${Vd.toFixed(2)} V</strong></p>
+          <p class="math">${sistema==="mono" ? 
+             "\\( V_d = \\dfrac{2\\, \\rho\\, L\\, I\\, \\cos\\phi}{S_{norm}} \\)" :
+             "\\( V_d = \\dfrac{\\sqrt{3}\\, \\rho\\, L\\, I\\, \\cos\\phi}{S_{norm}} \\)"}</p>
+          
+          <p>📉 Porcentaje de caída respecto a ${baseVoltage}V: <strong>${porcentaje.toFixed(2)}%</strong></p>
+          <p class="math">\\( \\% = \\dfrac{V_d}{${baseVoltage}} \\times 100\\% \\)</p>
+        `;
+      } else {
+        resultado.innerHTML = `<p>❌ Ninguna sección encontrada para ${I.toFixed(2)} A.</p>`;
+      }
+      
+      MathJax.typeset();
+    }
+  </script>
+</body>
+</html>
