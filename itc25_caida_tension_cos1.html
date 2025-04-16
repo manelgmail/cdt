@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Caída de Tensión ITC-BT-25</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; }
+    label { display: block; margin-top: 1rem; }
+    input { margin-top: 0.2rem; padding: 0.3rem; width: 200px; }
+    button { margin-top: 1rem; padding: 0.5rem 1rem; }
+    table { width: 100%; margin-top: 2rem; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: center; }
+    th { background: #f0f0f0; }
+    .danger { background-color: #ffe5e5; }
+    .safe { background-color: #e7fbe7; }
+  </style>
+</head>
+<body>
+
+<h2>Cálculo de Caída de Tensión (ITC-BT-25)</h2>
+<form onsubmit="añadirCircuito(); return false;">
+  <label>
+    Nombre del circuito:
+    <input type="text" id="circuito" placeholder="Ej: C1A" />
+  </label>
+  <label>
+    Longitud (m):
+    <input type="number" id="longitud" placeholder="Ej: 30" />
+  </label>
+  <label>
+    Cos φ:
+    <input type="number" step="0.01" id="coseno" placeholder="Ej: 0.95" value="1" />
+  </label>
+  <button type="submit">Añadir circuito</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Circuito</th>
+      <th>Intensidad (A)</th>
+      <th>Longitud (m)</th>
+      <th>Sección (mm²)</th>
+      <th>Caída V (V)</th>
+      <th>Caída %</th>
+      <th>Eliminar</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+const circuitos = {
+  C1: { intensidad: 10, seccion: 1.5 },
+  C2: { intensidad: 16, seccion: 2.5 },
+  C3: { intensidad: 25, seccion: 6 },
+  C4: { intensidad: 16, seccion: 2.5 },
+  C5: { intensidad: 16, seccion: 2.5 },
+  C6: { intensidad: 25, seccion: 6 },
+  C7: { intensidad: 16, seccion: 2.5 },
+  C8: { intensidad: 16, seccion: 2.5 },
+  C9: { intensidad: 20, seccion: 4 },
+  C10: { intensidad: 25, seccion: 6 },
+  C11: { intensidad: 25, seccion: 6 },
+  C12: { intensidad: 25, seccion: 6 },
+  C13: { intensidad: 25, seccion: 6 }
+};
+const letras = ["", "A", "B", "C"];
+const resistividad = 0.0178;
+const tension = 230;
+const secciones = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50];
+
+letras.forEach(l => {
+  Object.keys(circuitos).forEach(c => {
+    circuitos[c + l] = { ...circuitos[c] };
+  });
+});
+
+function calcular(intensidad, seccion, L, cos) {
+  const V = (2 * resistividad * L * intensidad * cos) / seccion;
+  const porcentaje = (V / tension) * 100;
+  return { V: V.toFixed(2), porcentaje: porcentaje.toFixed(2) };
+}
+
+function añadirCircuito() {
+  const nombre = document.getElementById('circuito').value.toUpperCase();
+  const L = parseFloat(document.getElementById('longitud').value);
+  const cos = parseFloat(document.getElementById('coseno').value);
+  const c = circuitos[nombre];
+  if (!c || isNaN(L) || isNaN(cos)) return;
+
+  const resultado = calcular(c.intensidad, c.seccion, L, cos);
+  const fila = document.createElement('tr');
+  if (resultado.porcentaje > 3) fila.className = 'danger';
+  fila.innerHTML = `
+    <td>${nombre}</td>
+    <td>${c.intensidad}</td>
+    <td>${L}</td>
+    <td>${c.seccion}</td>
+    <td>${resultado.V}</td>
+    <td>${resultado.porcentaje}</td>
+    <td><button onclick="this.closest('tr').remove()">❌</button></td>
+  `;
+  document.getElementById('tbody').appendChild(fila);
+
+  if (resultado.porcentaje > 3) {
+    for (let s of secciones) {
+      const nuevo = calcular(c.intensidad, s, L, cos);
+      if (parseFloat(nuevo.porcentaje) <= 3) {
+        const alt = document.createElement('tr');
+        alt.className = 'safe';
+        alt.innerHTML = `
+          <td>${nombre} (ajustado)</td>
+          <td>${c.intensidad}</td>
+          <td>${L}</td>
+          <td>${s}</td>
+          <td>${nuevo.V}</td>
+          <td>${nuevo.porcentaje}</td>
+          <td></td>
+        `;
+        document.getElementById('tbody').appendChild(alt);
+        break;
+      }
+    }
+  }
+
+  document.getElementById('circuito').value = '';
+  document.getElementById('longitud').value = '';
+}
+</script>
+</body>
+</html>
