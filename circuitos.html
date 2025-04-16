@@ -28,11 +28,37 @@
     .safe {
       background-color: #e7fbe7;
     }
+    .formulas {
+      background-color: #f9f9f9;
+      border: 1px dashed #aaa;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-family: "Courier New", monospace;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
 
 <h1>Caída de Tensión - ITC-BT-25</h1>
+
+<div class="formulas">
+<strong>Fórmulas utilizadas:</strong>
+
+1. Resistencia del conductor:
+    R = (ρ × L × 2) / S  
+    Donde:  
+    ρ = 0.0175 Ω·mm²/m (resistividad del cobre)  
+    L = longitud en metros  
+    S = sección en mm²  
+    (el ×2 es porque la corriente va y vuelve)
+
+2. Caída de tensión:
+    ΔV = I × R
+
+3. Porcentaje de caída:
+    %ΔV = (ΔV / 230V) × 100
+</div>
 
 <label>
   Circuito (Ej: C1, C1A...): 
@@ -64,22 +90,22 @@
 
 <script>
 const circuitosBase = [
-  { nombre: "C1", intensidad: 10, seccion: 1.5 },
-  { nombre: "C2", intensidad: 16, seccion: 2.5 },
-  { nombre: "C3", intensidad: 25, seccion: 6 },
-  { nombre: "C4", intensidad: 16, seccion: 2.5 },
-  { nombre: "C5", intensidad: 16, seccion: 2.5 },
-  { nombre: "C6", intensidad: 25, seccion: 6 },
-  { nombre: "C7", intensidad: 16, seccion: 2.5 },
-  { nombre: "C8", intensidad: 16, seccion: 2.5 },
-  { nombre: "C9", intensidad: 20, seccion: 4 },
-  { nombre: "C10", intensidad: 25, seccion: 6 },
-  { nombre: "C11", intensidad: 25, seccion: 6 },
-  { nombre: "C12", intensidad: 25, seccion: 6 },
-  { nombre: "C13", intensidad: 25, seccion: 6 }
+  { nombre: \"C1\", intensidad: 10, seccion: 1.5 },
+  { nombre: \"C2\", intensidad: 16, seccion: 2.5 },
+  { nombre: \"C3\", intensidad: 25, seccion: 6 },
+  { nombre: \"C4\", intensidad: 16, seccion: 2.5 },
+  { nombre: \"C5\", intensidad: 16, seccion: 2.5 },
+  { nombre: \"C6\", intensidad: 25, seccion: 6 },
+  { nombre: \"C7\", intensidad: 16, seccion: 2.5 },
+  { nombre: \"C8\", intensidad: 16, seccion: 2.5 },
+  { nombre: \"C9\", intensidad: 20, seccion: 4 },
+  { nombre: \"C10\", intensidad: 25, seccion: 6 },
+  { nombre: \"C11\", intensidad: 25, seccion: 6 },
+  { nombre: \"C12\", intensidad: 25, seccion: 6 },
+  { nombre: \"C13\", intensidad: 25, seccion: 6 }
 ];
 
-const letras = ["", "A", "B", "C"];
+const letras = [\"\", \"A\", \"B\", \"C\"];
 const seccionesNormalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50];
 const resistividad = 0.0175;
 const tension = 230;
@@ -126,7 +152,7 @@ function añadirCircuito() {
     <td>${circuito.seccion}</td>
     <td>${resultado.V}</td>
     <td>${resultado.porcentaje}</td>
-    <td><button onclick="this.closest('tr').remove()">Eliminar</button></td>
+    <td><button onclick=\"this.closest('tr').remove()\">Eliminar</button></td>
   `;
   document.getElementById('tbody').appendChild(fila);
 
