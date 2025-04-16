@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Caída de Tensión - ITC-BT-25</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .danger {
+      background-color: #ffe5e5;
+    }
+    .safe {
+      background-color: #e7fbe7;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Caída de Tensión - ITC-BT-25</h1>
+
+<label>
+  Circuito (Ej: C1, C1A...): 
+  <input type="text" id="circuito" />
+</label>
+<br /><br />
+<label>
+  Longitud (m): 
+  <input type="number" id="longitud" />
+</label>
+<br /><br />
+<button onclick="añadirCircuito()">Añadir circuito</button>
+
+<table id="tabla">
+  <thead>
+    <tr>
+      <th>Circuito</th>
+      <th>Intensidad (A)</th>
+      <th>Longitud (m)</th>
+      <th>Sección (mm²)</th>
+      <th>Caída V (V)</th>
+      <th>Caída %</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="tbody">
+  </tbody>
+</table>
+
+<script>
+const circuitosBase = [
+  { nombre: "C1", intensidad: 10, seccion: 1.5 },
+  { nombre: "C2", intensidad: 16, seccion: 2.5 },
+  { nombre: "C3", intensidad: 25, seccion: 6 },
+  { nombre: "C4", intensidad: 16, seccion: 2.5 },
+  { nombre: "C5", intensidad: 16, seccion: 2.5 },
+  { nombre: "C6", intensidad: 25, seccion: 6 },
+  { nombre: "C7", intensidad: 16, seccion: 2.5 },
+  { nombre: "C8", intensidad: 16, seccion: 2.5 },
+  { nombre: "C9", intensidad: 20, seccion: 4 },
+  { nombre: "C10", intensidad: 25, seccion: 6 },
+  { nombre: "C11", intensidad: 25, seccion: 6 },
+  { nombre: "C12", intensidad: 25, seccion: 6 },
+  { nombre: "C13", intensidad: 25, seccion: 6 }
+];
+
+const letras = ["", "A", "B", "C"];
+const seccionesNormalizadas = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50];
+const resistividad = 0.0175;
+const tension = 230;
+
+const circuitos = circuitosBase.flatMap(c =>
+  letras.map(l => ({
+    nombre: c.nombre + l,
+    intensidad: c.intensidad,
+    seccion: c.seccion
+  }))
+);
+
+function calcularCaida(intensidad, seccion, longitud) {
+  const R = (resistividad * longitud * 2) / seccion;
+  const V = intensidad * R;
+  const porcentaje = (V / tension) * 100;
+  return { V: V.toFixed(2), porcentaje: porcentaje.toFixed(2) };
+}
+
+function calcularAlternativa(intensidad, longitud) {
+  for (const s of seccionesNormalizadas) {
+    const { porcentaje } = calcularCaida(intensidad, s, longitud);
+    if (parseFloat(porcentaje) <= 3) {
+      const resultado = calcularCaida(intensidad, s, longitud);
+      return { seccion: s, ...resultado };
+    }
+  }
+  return null;
+}
+
+function añadirCircuito() {
+  const nombre = document.getElementById('circuito').value.toUpperCase().trim();
+  const longitud = parseFloat(document.getElementById('longitud').value);
+  const circuito = circuitos.find(c => c.nombre === nombre);
+  if (!circuito || !longitud) return;
+
+  const resultado = calcularCaida(circuito.intensidad, circuito.seccion, longitud);
+  const fila = document.createElement('tr');
+  fila.className = parseFloat(resultado.porcentaje) > 3 ? 'danger' : '';
+  fila.innerHTML = `
+    <td>${nombre}</td>
+    <td>${circuito.intensidad}</td>
+    <td>${longitud}</td>
+    <td>${circuito.seccion}</td>
+    <td>${resultado.V}</td>
+    <td>${resultado.porcentaje}</td>
+    <td><button onclick="this.closest('tr').remove()">Eliminar</button></td>
+  `;
+  document.getElementById('tbody').appendChild(fila);
+
+  if (parseFloat(resultado.porcentaje) > 3) {
+    const alternativo = calcularAlternativa(circuito.intensidad, longitud);
+    if (alternativo) {
+      const filaAlt = document.createElement('tr');
+      filaAlt.className = 'safe';
+      filaAlt.innerHTML = `
+        <td>${nombre} (ajustado)</td>
+        <td>${circuito.intensidad}</td>
+        <td>${longitud}</td>
+        <td>${alternativo.seccion}</td>
+        <td>${alternativo.V}</td>
+        <td>${alternativo.porcentaje}</td>
+        <td></td>
+      `;
+      document.getElementById('tbody').appendChild(filaAlt);
+    }
+  }
+
+  document.getElementById('circuito').value = '';
+  document.getElementById('longitud').value = '';
+}
+</script>
+
+</body>
+</html>
